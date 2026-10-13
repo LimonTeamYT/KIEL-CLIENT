@@ -1,48 +1,10 @@
 
-name: Build KIEL CLIENT APK
-
-on:
-  workflow_dispatch:
-  push:
-    paths:
-      - "KIEL_CLIENT_ANDROID_SOURCE.zip"
-      - ".github/workflows/**"
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "17"
-
       - name: Install Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Accept Android SDK licenses
+
+        run: yes | sdkmanager --licenses
+
       - name: Install SDK packages
         run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
-
-      - name: Extract project
-        run: |
-          unzip -o KIEL_CLIENT_ANDROID_SOURCE.zip -d .
-          test -f KIEL_CLIENT_ANDROID/app/build.gradle
-
-      - name: Install Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: "8.9"
-
-      - name: Build APK
-        run: gradle -p KIEL_CLIENT_ANDROID assembleDebug
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: KIEL-CLIENT-APK
-          path: KIEL_CLIENT_ANDROID/app/build/outputs/apk/debug/*.apk
